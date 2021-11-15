@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xyh.authorityManagement.mapper.UserMapper">
+
+   <!--添加用户-->
+    <insert id="insertUser" parameterType="user">
+        INSERT INTO
+            user
+        VALUES (
+        <if test="userCode!=null">
+            ,#{userCode}
+        </if>
+        <if test="userCode=null">
+            ,null
+        </if>
+        <if test="userName!=null">
+            ,#{userName}
+        </if>
+        <if test="userName=null">
+            ,null
+        </if>
+        <if test="password!=null">
+            ,#{password}
+        </if>
+        <if test="password=null">
+            ,null
+        </if>
+        <if test="userBirthday!=null">
+            ,#{userBirthday}
+        </if>
+        <if test="userBirthday=null">
+            ,null
+        </if>
+        );
+    </insert>
+    <!--给用户添加角色信息-->
+    <insert id="insertUserRole">
+        INSERT INTO
+        user_role
+        VALUES (#{userId},#{roleId})
+
+    </insert>
+    <!--根据用户编号更新用户信息-->
+    <update id="updateUser" parameterType="user">
+        UPDATE user
+        SET
+        <if test="userCode!=null">
+            user_code=#{userCode}
+        </if>
+        <if test="userName!=null">
+            ,user_name=#{userName}
+        </if>
+        <if test="password!=null">
+            ,user_pwd=#{password}
+        </if>
+        <if test="userBirthday!=null">
+            ,user_birthday=#{userBirthday}
+        </if>
+        WHERE
+        <if test="user_id!=null">
+            user_id=#{userId}
+        </if>
+    </update>
+    <!--更新用户密码-->
+    <update id="updatePasswordById" parameterType="user">
+        UPDATE
+            user
+        SET
+        <if test="password!=null">
+            user_pwd=#{password}
+        </if>
+        WHERE
+        <if test="userId!=null">
+            user_id=#{userId}
+        </if>
+    </update>
+    <!--更新用户信息根据账号-->
+    <update id="updateUserByUserCode" parameterType="user">
+        UPDATE
+            user
+        SET
+        <if test="userName!=null">
+            user_name=#{userName}
+        </if>
+        <if test="password!=null">
+            ,user_pwd=#{password}
+        </if>
+        <if test="user_birthday!=null">
+            ,user_birthday=#{userBirthday}
+        </if>
+        WHERE
+        <if test="userCode!=null">
+            user_code=#{userCode}
+        </if>
+    </update>
+    <!--根据主键删除用户-->
+    <delete id="deleteUserById">
+        DELETE
+        FROM
+        user
+        WHERE
+        user_id=#{userId}
+    </delete>
+    <!--根据用户id删除对应角色-->
+    <delete id="deleteUserRole">
+        DELETE
+        FROM
+        user_role
+        WHERE
+        userid=#{userId}
+    </delete>
+
+    <select id="selectUserByCodeAndPwd" resultType="User">
+        SELECT
+            user_id,user_code,user_name,user_pwd,user_birthday
+        FROM
+            user
+        WHERE
+            user_code=#{username}and
+            user_pwd=#{userPwd}
+    </select>
+    <!--查询所有用户信息-->
+    <select id="selectUserListByPage" resultType="com.xyh.authorityManagement.pojo.User">
+        SELECT
+            user_id,user_code,user_name,user_pwd,user_birthday
+        FROM
+            user
+        <if test="user_name!=null">
+            WHERE
+                user_name LIKE '%${userName}'
+        </if>
+    </select>
+    <!--查询用户姓名，自动补全-->
+    <select id="selectUserName" resultType="com.xyh.authorityManagement.pojo.User" parameterType="string">
+        SELECT user_name
+        FROM user
+        WHERE
+            user_name LIKE CONCAT('%',#{user_name},'%')
+    </select>
+    <!--根据userid获取用户对应的角色-->
+    <select id="selectUserRole" resultType="com.xyh.authorityManagement.pojo.Role">
+        SELECT
+            uuid
+        FROM
+            user_role,role
+        WHERE
+            user_role.userid=#{userId}
+        AND
+            user_role.roleuuid=role.uuid;
+    </select>
+    <select id="selectUserlistByPage" resultType="com.xyh.authorityManagement.pojo.User">
+        SELECT
+            user_id,user_code,user_name,user_pwd,user_birthday
+        FROM
+            user
+        <if test="userName!=null">
+            WHERE
+                user_name LIKE '%${userName}'
+        </if>
+    </select>
+    <!--查询账号对应用户-->
+    <select id="selectUserByUserCode" resultType="com.xyh.authorityManagement.pojo.User">
+        SELECT
+            user_code,user_name,user_birthday
+        FROM
+            user
+        WHERE
+            user_code=#{userCode}
+    </select>
+</mapper>

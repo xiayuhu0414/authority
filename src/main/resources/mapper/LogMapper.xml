@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xyh.authorityManagement.mapper.LogMapper">
+
+    <!--插入日志-->
+    <insert id="insertLog" parameterType="int">
+        INSERT INTO log
+        VALUES (0
+        <if test="operator!=null">
+            ,#{operator}
+        </if>
+        <if test="operator=null">
+            ,null
+        </if>
+        <if test="operatorType!=null">
+            ,#{operatorType}
+        </if>
+        <if test="operatorType=null">
+            ,null
+        </if>
+        <if test="operatorDate!=null">
+            ,#{operatorDaate}
+        </if>
+        <if test="operatorDate=null">
+            ,null
+        </if>
+        <if test="operatorResult!=null">
+            ,#{operateResult}
+        </if>
+        <if test="operatorResult=null">
+            ,null
+        </if>
+        <if test="ip!=null">
+           , #{ip}
+        </if>
+        <if test="ip=null">
+            ,null
+        </if>
+        );
+    </insert>
+    <!--根据操作者模糊查询操作者，自动补全-->
+    <select id="selectLogOperator" parameterType="string" resultType="Log">
+        SELECT DISTINCT operateor
+        FROM log
+        WHERE
+        operator like CONCAT('%',#{operator},'%')
+    </select>
+    <!--日志分页查询-->
+    <select id="selectLogListPage" resultType="log" parameterType="log">
+        SELECT
+        id,operateor,operateType,operateDate,operateResult,ip
+        FROM
+            log
+        <if test="operateType!=null">
+            WHERE
+            operateType like CONCAT('%',#{operator},'%')
+        </if>
+    </select>
+</mapper>

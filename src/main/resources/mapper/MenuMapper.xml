@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xyh.authorityManagement.mapper.MenuMapper">
+<!--初始化树-->
+    <resultMap type="com.xyh.authorityManagement.vo.Tree" id="menuTree">
+        <id column="menuId" property="id" javaType="java.lang.String" />
+        <result column="menuName" property="text" javaType="java.lang.String" />
+        <collection column="menuId" property="children" select="selectChild"/>
+    </resultMap>
+    <!--插入数据-->
+    <insert id="insertMenu" parameterType="menu">
+        INSERT INTO menu
+        VALUES (
+        <if test='menuId!=null and menuId!=""'>
+            #{menuId}
+        </if>
+        <if test='menuId==null or menuId==""'>
+            null
+        </if>
+        <if test='menuName!=null and menuName!=""'>
+            ,#{menuName}
+        </if>
+        <if test='menuName==null or menuName==""'>
+            ,null
+        </if>
+        <if test='url!=null and url!=""'>
+            ,#{url}
+        </if>
+        <if test='url==null or url==""'>
+            ,null
+        </if>
+        <if test='icon!=null and icon!=""'>
+            ,#{icon}
+        </if>
+        <if test='icon==null or icon==""'>
+            ,null
+        </if>
+        <if test='pid!=null and pid!=""'>
+            ,#{pid}
+        </if>
+        <if test='pid==null or pid==""'>
+            ,null
+        </if>
+        <if test='isParent!=null and isParent!=""'>
+            ,#{isParent}
+        </if>
+        <if test='isParent==null or isParent==""'>
+            ,null
+        </if>
+        );
+    </insert>
+    <!--通过id修改菜单-->
+    <update id="updateMenuById" parameterType="menu">
+        update menu
+        <trim prefix="set" suffixOverrides="," suffix="where menuId = #{menuId}">
+            <if test='menuName!=null and menuName!=""'>
+                menuName=#{menuName},
+            </if>
+            <if test='url!=null and url!=""'>
+                url=#{url},
+            </if>
+            <if test='icon!=null and icon!=""'>
+                icon=#{icon},
+            </if>
+            <if test='pid!=null and pid!=""'>
+                pid=#{pid},
+            </if>
+            <if test='isParent!=null and isParent!=""'>
+                isParent=#{isParent}
+            </if>
+        </trim>
+    </update>
+    <!--根据id删除数据-->
+    <delete id="deleteMenuById">
+        DELETE FROM
+            menu
+            WHERE
+            menuId=#{0}
+    </delete>
+
+    <!--根据userID加载对应菜单-->
+    <select id="selectMenuByUserid" resultType="Menu">
+        SELECT
+           DISTINCT menu.menId,menuName,menu.url,menu.icon,menu.pid
+        FROM
+          user_role,
+          role,
+          role_menu,
+          menu
+        WHERE
+            user_role.roleuuid=role.uuid
+            AND role.uuid=role_menu.roleuuid
+            AND role_menu.menuuuid=menu.menuid
+            AND user_role.userid=#{userId}
+    </select>
+    <select id="selectMenuList" resultType="com.xyh.authorityManagement.vo.Tree"></select>
+    <!--根据id查询菜单-->
+    <select id="selectMenuById" resultType="com.xyh.authorityManagement.pojo.Menu">
+        SELECT
+            menuId,menuName,url,icon,pid,isParent
+        FROM
+            menu
+        WHERE
+            menuId=#{menuId}
+
+    </select>
+    <!--查询菜单所有属性-->
+    <select id="selectMenu" resultType="com.xyh.authorityManagement.pojo.Menu">
+        SELECT menuId,menuName,url,icon,pid
+        FROM menu
+        WHERE pid=#{pid}
+    </select>
+    <!-- 查询所有菜单的id、name -->
+    <select id="selectMenuIdName" resultType="com.xyh.authorityManagement.pojo.Menu">
+        SELECT
+            menuId,menuNane
+        FROM
+            menu
+        WHERE
+            pid=#{pid}
+    </select>
+</mapper>
